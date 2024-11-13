@@ -3,3 +3,5 @@
 __pycache__
 input_user.csv.csv
 notebook.ipynb
+logs
+.DS_Store

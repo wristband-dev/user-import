@@ -1,3 +1,0 @@
-username,status_code,message
-fddiferd,400,"{'type': 'constraint_violations_error', 'code': 'message_body_constraint_violations', 'message': 'Field violations were detected in the request body', 'ticket': '11zi6qp4eeve8', 'violations': {'email': [{'code': 'not_unique'}]}}"
-donato,400,"{'type': 'constraint_violations_error', 'code': 'message_body_constraint_violations', 'message': 'Field violations were detected in the request body', 'ticket': 'ziz31umugslh', 'violations': {'username': [{'code': 'not_unique'}]}}"

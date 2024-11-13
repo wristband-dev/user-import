@@ -38,6 +38,7 @@ class service:
 
     def upload_user_csv(
         self,
+        invite_users = True
     ): 
         # Initialize log
         logs = []
@@ -50,20 +51,20 @@ class service:
             response_json = create_user_response.json()
             
             log = {
-                'username': user.get('username'),
+                'email': user.get('email'),
                 'status_code': status_code,
             }
 
             if status_code != 201:
                 log['message'] = response_json
-            else:
+            elif invite_users:
                 invite_exisiting_user_response = self.invite_existing_user(user_id=response_json.get('id'))
                 log['message'] = invite_exisiting_user_response.json()['existingUserInvitationRequest']['status']
 
             logs.append(log)
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        pd.DataFrame(logs).to_csv(f'logs_{timestamp}.csv', index=False)
+        pd.DataFrame(logs).to_csv(f'logs/{timestamp}.csv', index=False)
         return logs
     
     def create_user(
