@@ -44,3 +44,41 @@ Example .env file:
 ```ini
 
 ```
+
+5. **Distribute to PyPi**
+# Increment the version number
+- PATCH for bug fixes (e.g., 0.1.1)
+   - MINOR for new features (e.g., 0.2.0)
+   - MAJOR for incompatible API changes (e.g., 1.0.0)
+
+# Clean previous builds (optional but recommended)
+```bash
+rm -rf build dist *.egg-info 
+```
+# Upgrade setuptools and wheel (optional but good practice)
+```bash
+pip install --upgrade setuptools wheel
+```
+# Build the distribution packages
+```bash
+python setup.py sdist bdist_wheel
+```
+# Upload the New Version to PyPI
+```bash
+pip install --upgrade twine
+```
+# Upload the package to PyPI
+```bash
+twine upload dist/*
+```
+# Verify the Upload
+```bash
+pip install wristband
+```
+
+
+
+python3 wristband/oauth2.py \
+   --application_vanity_domain "invoexp-donato.us.wristband.dev" \
+   --client_id "ploopscbu5cmzi4hndvcsyepi4" \
+   --client_secret "dc0a4ba0a4e10cb670c1c95a66d11698"

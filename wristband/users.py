@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import pandas as pd
-from exceptions import AuthenticationError, AuthorizationError, BadRequestError
+from wristband.exceptions import AuthenticationError, AuthorizationError, BadRequestError
 import math
 from datetime import datetime
 
