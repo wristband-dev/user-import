@@ -78,7 +78,7 @@ pip install wristband
 
 
 
-python3 wristband/oauth2.py \
+python3 get_token \
    --application_vanity_domain "invoexp-donato.us.wristband.dev" \
    --client_id "ploopscbu5cmzi4hndvcsyepi4" \
    --client_secret "dc0a4ba0a4e10cb670c1c95a66d11698"
