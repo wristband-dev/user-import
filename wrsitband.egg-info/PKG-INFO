@@ -1,9 +1,0 @@
-Metadata-Version: 2.1
-Name: wrsitband
-Version: 0.1
-Summary: A package for fetching data from the Withings API
-Home-page: https://github.com/wristband-dev/wristband-python.git
-Author: Donato Di Ferdinando
-Author-email: fddiferd@gmail.com
-Requires-Dist: requests
-Requires-Dist: pandas

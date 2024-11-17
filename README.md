@@ -54,22 +54,26 @@ Example .env file:
 # Clean previous builds (optional but recommended)
 ```bash
 rm -rf build dist *.egg-info 
+pip install --upgrade setuptools wheel
+python3 setup.py sdist bdist_wheel
+pip install --upgrade twine
+twine upload dist/*
 ```
 # Upgrade setuptools and wheel (optional but good practice)
 ```bash
-pip install --upgrade setuptools wheel
+
 ```
 # Build the distribution packages
 ```bash
-python setup.py sdist bdist_wheel
+
 ```
 # Upload the New Version to PyPI
 ```bash
-pip install --upgrade twine
+
 ```
 # Upload the package to PyPI
 ```bash
-twine upload dist/*
+
 ```
 # Verify the Upload
 ```bash

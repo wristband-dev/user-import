@@ -2,8 +2,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='wrsitband',
-    version='0.1',
+    name='wristband',
+    version='0.1.1',
     description='A package for fetching data from the Withings API',
     author='Donato Di Ferdinando',
     author_email='fddiferd@gmail.com',

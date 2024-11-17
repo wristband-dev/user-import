@@ -5,3 +5,5 @@ input_user.csv.csv
 notebook.ipynb
 logs
 .DS_Store
+wrsitband.egg-info
+dist
