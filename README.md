@@ -6,7 +6,7 @@
 
    To keep your project's dependencies isolated, it's recommended to use a virtual environment. You can create one using the following command:
    ```bash
-   python -m venv .venv
+   python3 -m venv .venv
    ```
 
 2.  **Activate the Virtual Environment**
@@ -82,7 +82,7 @@ pip install wristband
 
 
 
-python3 get_token \
+python3 get_token.py \
    --application_vanity_domain "invoexp-donato.us.wristband.dev" \
    --client_id "ploopscbu5cmzi4hndvcsyepi4" \
    --client_secret "dc0a4ba0a4e10cb670c1c95a66d11698"

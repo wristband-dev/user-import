@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wristband',
-    version='0.1.1',
+    version='0.1.3',
     description='A package for fetching data from the Withings API',
     author='Donato Di Ferdinando',
     author_email='fddiferd@gmail.com',
@@ -15,6 +15,6 @@ setup(
         ],
     },
     install_requires=[
-        'requests', 'pandas', 'os', 'argparse'
+        'requests', 'pandas'
     ],  # Add any dependencies here
 )
