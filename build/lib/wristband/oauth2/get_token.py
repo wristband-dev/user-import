@@ -2,7 +2,13 @@ import requests
 from requests.auth import HTTPBasicAuth
 import pandas as pd
 import argparse
-from .exceptions import get_non_empty_response, AuthenticationError, AuthorizationError, BadRequestError
+from ..exceptions import (
+    get_non_empty_response,
+    AuthenticationError,
+    AuthorizationError,
+    BadRequestError,
+)
+
 
 def get_token(application_vanity_domain, client_id, client_secret):
     # Construct the URL

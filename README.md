@@ -58,6 +58,10 @@ pip install --upgrade setuptools wheel
 python3 setup.py sdist bdist_wheel
 pip install --upgrade twine
 twine upload dist/*
+
+
+pypi-AgEIcHlwaS5vcmcCJGRlYjEyYjFmLWUwMTctNDVjOS05OTY0LTFmMzU2ZTNiYzdmOQACKlszLCI1M2Q5NGU3NS0xODI1LTQzNzQtYmY1ZS04NGRhOTFlYTViMzMiXQAABiB3yYxtfrKBrH3JgVrvAxc-xOjyh8vC3DjDVPn1MqnOog
+
 ```
 # Upgrade setuptools and wheel (optional but good practice)
 ```bash
