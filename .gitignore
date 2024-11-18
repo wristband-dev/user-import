@@ -2,10 +2,10 @@
 .venv
 __pycache__
 input_user.csv.csv
-notebook.ipynb
 logs
 .DS_Store
 wrsitband.egg-info
 dist
 wristband.egg-info
 build
+notebook.ipynb
