@@ -1,7 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
-
-from ..exceptions import (
+from wristband.exceptions import (
     AuthenticationError,
     AuthorizationError,
     BadRequestError,

@@ -4,15 +4,16 @@ import pandas as pd
 from wristband.exceptions import AuthenticationError, AuthorizationError, BadRequestError
 import math
 from datetime import datetime
+import os
 
-class service:
-    def __init__(self, token, application_vanity_domain, tenant_id, identity_provider_name):
+class UsersService:
+    def __init__(self, token=None, application_vanity_domain=None, tenant_id=None, identity_provider_name=None):
         self.token = token
         self.application_vanity_domain = application_vanity_domain
         self.tenant_id = tenant_id
         self.identity_provider_name = identity_provider_name
 
-        self.input_file_name = 'input_user.csv'
+        self.input_file_name = 'input_users.csv'
         self.allowed_user_fields  = [
             'username',
             'password',
@@ -36,7 +37,7 @@ class service:
             'timeZone'
         ]
 
-    def upload_user_csv(
+    def upload_users_csv(
         self,
         invite_users = True
     ): 
@@ -44,7 +45,7 @@ class service:
         logs = []
 
         # Get users
-        users = self.get_user_fields_from_csv()
+        users = self.get_input_users_from_csv()
         for user in users:
             create_user_response = self.create_user(user_fields=user)
             status_code = create_user_response.status_code
@@ -64,6 +65,8 @@ class service:
             logs.append(log)
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        if not os.path.exists('logs'):
+            os.makedirs('logs')
         pd.DataFrame(logs).to_csv(f'logs/{timestamp}.csv', index=False)
         return logs
     
@@ -74,6 +77,9 @@ class service:
         """
         API Docs - https://docs.wristband.dev/reference/createuserv1
         """
+        if not self.token or not self.application_vanity_domain or not self.tenant_id or not self.identity_provider_name:
+            raise BadRequestError("Service is not properly initialized with required credentials.")
+
         # Construct the URL
         url = f'https://{self.application_vanity_domain}/api/v1/users'
 
@@ -116,6 +122,9 @@ class service:
         """
         API Docs - https://docs.wristband.dev/reference/inviteexistinguserv1
         """
+        if not self.token or not self.application_vanity_domain or not self.tenant_id or not self.identity_provider_name:
+            raise BadRequestError("Service is not properly initialized with required credentials.")
+
         # Construct the URL
         url = f'https://{self.application_vanity_domain}/api/v1/existing-user-invitation/invite-user'
 
@@ -142,14 +151,14 @@ class service:
         # Return response
         return response          
         
-    def create_input_user_csv(self):
+    def create_input_users_csv(self):
         # Create a DataFrame with the allowed user fields as columns
         df = pd.DataFrame(columns=self.allowed_user_fields)
 
         # Save the DataFrame to a CSV file
         df.to_csv(f'{self.input_file_name}.csv', index=False)
 
-    def get_user_fields_from_csv(self):
+    def get_input_users_from_csv(self):
         # Read the CSV file into a DataFrame
         df = pd.read_csv(f'{self.input_file_name}.csv')
 

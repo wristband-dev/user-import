@@ -1,7 +1,6 @@
 import argparse
-
-from .token_utils import get_token
-from ..exceptions import (
+from wristband.oauth2.token_utils import get_token
+from wristband.exceptions import (
     get_non_empty_response,
     AuthenticationError,
     AuthorizationError,

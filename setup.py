@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wristband',
-    version='0.1.8',
+    version='0.2.4',
     description='A package for fetching data from the Withings API',
     author='Donato Di Ferdinando',
     author_email='fddiferd@gmail.com',
