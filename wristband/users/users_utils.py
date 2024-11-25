@@ -5,6 +5,31 @@ from wristband.exceptions import AuthenticationError, AuthorizationError, BadReq
 import math
 from datetime import datetime
 import os
+from dataclasses import dataclass
+from typing import List
+import json
+
+
+@dataclass
+class RolesResponse:
+
+    @dataclass
+    class Role:
+        id: str
+        name: str
+        displayName: str
+
+    totalResults: int
+    startIndex: int
+    itemsPerPage: int
+    items: List[Role]
+
+
+    @classmethod
+    def from_json(cls, json_string):
+        data = json.loads(json_string)
+        return cls(**data)
+
 
 class UsersService:
     def __init__(self, token=None, application_vanity_domain=None, tenant_id=None, identity_provider_name=None):
@@ -37,6 +62,7 @@ class UsersService:
             'timeZone'
         ]
 
+    # Wristband Api Funcs
     def upload_users_csv(
         self,
         invite_users = True
@@ -151,6 +177,66 @@ class UsersService:
         # Return response
         return response          
         
+    def get_tenant_roles(self):
+        """
+        API Docs - https://docs.wristband.dev/reference/querytenantrolesv1
+        Implements pagination to retrieve all roles.
+        """
+        if not self.token or not self.application_vanity_domain or not self.tenant_id:
+            raise BadRequestError("Service is not properly initialized with required credentials.")
+
+        # Base URL
+        base_url = f'https://{self.application_vanity_domain}/api/v1/tenants/{self.tenant_id}/roles'
+
+        # Headers to indicate the type of data being sent
+        headers = {
+            'accept': 'application/json',
+            'authorization': f'Bearer {self.token}',
+            'host': f'{self.application_vanity_domain}',
+            'content-type': 'application/json',
+        }
+
+        # Pagination parameters
+        start_index = 1
+        items_per_page = 20
+        all_roles = []
+
+        while True:
+            # Construct the URL with pagination
+            url = f"{base_url}?include_application_roles=true&fields=id,name,displayName&sort_by=displayName:asc&startIndex={start_index}&count={items_per_page}"
+
+            # Perform the GET request
+            response = requests.get(url, headers=headers)
+
+            if response.status_code == 404:
+                raise BadRequestError("ApplicationId is not valid - please rerun script & enter a valid applicationId")
+            elif response.status_code == 403:
+                raise AuthorizationError("Client is not authorized to perform the user export - please make sure that the client has the appropriate permissions assigned to it and then rerun script")
+
+            # Parse the response
+            json_data = response.json()
+
+            # Convert to RolesResponse
+            roles_response = RolesResponse.from_json(json.dumps(json_data))
+
+            # Add current page roles to the list
+            all_roles.extend(roles_response.items)
+
+            # Check if there are more items to fetch
+            total_results = roles_response.totalResults
+            start_index += items_per_page
+
+            if start_index > total_results:
+                break
+
+        return RolesResponse(
+            totalResults=len(all_roles),
+            startIndex=1,
+            itemsPerPage=items_per_page,
+            items=all_roles
+        )
+
+    # CSV Funcs
     def create_input_users_csv(self):
         # Create a DataFrame with the allowed user fields as columns
         df = pd.DataFrame(columns=self.allowed_user_fields)

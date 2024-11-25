@@ -20,7 +20,7 @@ Activate the virtual environment to ensure that any packages you install are con
 
    - On macOS/Linux:
    ```bash
-   source .venv/bin/activate
+   source .venv/bin/activateg
    ```
 
 3.	**Install the Dependencies**
