@@ -9,3 +9,4 @@ dist
 wristband.egg-info
 build
 notebook.ipynb
+import_users.csv

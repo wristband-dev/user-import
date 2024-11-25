@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wristband',
-    version='0.2.4',
+    version='3.0.0',
     description='A package for fetching data from the Withings API',
     author='Donato Di Ferdinando',
     author_email='fddiferd@gmail.com',
@@ -11,7 +11,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'get_token=wristband.oauth2:main',
+            'create_token=wristband.oauth2:main',
         ],
     },
     install_requires=[

@@ -1,254 +1,145 @@
-import requests
-from requests.auth import HTTPBasicAuth
 import pandas as pd
-from wristband.exceptions import AuthenticationError, AuthorizationError, BadRequestError
-import math
 from datetime import datetime
 import os
-from dataclasses import dataclass
 from typing import List
-import json
-
-
-@dataclass
-class RolesResponse:
-
-    @dataclass
-    class Role:
-        id: str
-        name: str
-        displayName: str
-
-    totalResults: int
-    startIndex: int
-    itemsPerPage: int
-    items: List[Role]
-
-
-    @classmethod
-    def from_json(cls, json_string):
-        data = json.loads(json_string)
-        return cls(**data)
+from wristband.users.models.user import User
+from wristband.users.create_user import create_user
+from wristband.users.invite_existing_user import invite_existing_user
+from wristband.roles.get_tenant_roles import get_tenant_roles
+from wristband.roles.assign_roles_to_user import assign_roles_to_user
 
 
 class UsersService:
-    def __init__(self, token=None, application_vanity_domain=None, tenant_id=None, identity_provider_name=None):
+    def __init__(
+        self, 
+        token:str = None,
+        application_vanity_domain:str = None, 
+        tenant_id:str = None, 
+        identity_provider_name:str = None
+    ):
+
         self.token = token
         self.application_vanity_domain = application_vanity_domain
         self.tenant_id = tenant_id
         self.identity_provider_name = identity_provider_name
 
-        self.input_file_name = 'input_users.csv'
-        self.allowed_user_fields  = [
-            'username',
-            'password',
-            'email',
-            'emailVerified',
-            'externalId',
-            'fullName',
-            'givenName',
-            'familyName',
-            'middleName',
-            'honorificPrefix',
-            'honorificSuffix',
-            'nickname',
-            'displayName',
-            'pictureUrl',
-            'gender',
-            'birthdate',
-            'phoneNumber',
-            'preferredLanguage',
-            'locale',
-            'timeZone'
-        ]
+        self.import_file_path = 'import_users.csv'
 
-    # Wristband Api Funcs
     def upload_users_csv(
         self,
         invite_users = True
     ): 
-        # Initialize log
+        """
+        Reads a CSV file and uploads the users to Wristband.
+        """
+        # Init
         logs = []
+        did_fetch_roles = False
 
         # Get users
-        users = self.get_input_users_from_csv()
+        users = self.get_import_users_from_csv()
         for user in users:
-            create_user_response = self.create_user(user_fields=user)
-            status_code = create_user_response.status_code
-            response_json = create_user_response.json()
+            
+            response = create_user(
+                token=self.token,
+                application_vanity_domain=self.application_vanity_domain,
+                tenant_id=self.tenant_id,
+                identity_provider_name=self.identity_provider_name,
+                user=user
+            )
+            status_code = response.status_code
+            json_data = response.json()
             
             log = {
-                'email': user.get('email'),
-                'status_code': status_code,
+                'email': user.email,
+                'status_code': json_data,
             }
 
             if status_code != 201:
-                log['message'] = response_json
+                log['message'] = json_data
             elif invite_users:
-                invite_exisiting_user_response = self.invite_existing_user(user_id=response_json.get('id'))
-                log['message'] = invite_exisiting_user_response.json()['existingUserInvitationRequest']['status']
+
+                # Invite existing user
+                response = invite_existing_user(
+                    token=self.token,
+                    application_vanity_domain=self.application_vanity_domain,
+                    tenant_id=self.tenant_id,
+                    identity_provider_name=self.identity_provider_name,
+                    user_id=json_data.get('id')
+                )
+                log['message'] = response.json()['existingUserInvitationRequest']['status']
+
+                # Fetch roles
+                if not did_fetch_roles:
+                    roles = get_tenant_roles(
+                        token=self.token,
+                        application_vanity_domain=self.application_vanity_domain,
+                        tenant_id=self.tenant_id
+                    )
+                    did_fetch_roles = True
+
+                # Assign roles
+                role_responses = []
+                user_roles = user.roles.split(',') if isinstance(user.roles, str) else user.roles or []
+                user_roles = [role.strip() for role in user_roles]  # Strip whitespace
+
+                for role_name in user_roles:
+                    # Find the matching role by displayName
+                    matched_roles = [role for role in roles if role.get('displayName') == role_name]
+
+                    if matched_roles:
+                        response = assign_roles_to_user(
+                            token=self.token,
+                            application_vanity_domain=self.application_vanity_domain,
+                            user_id=json_data.get('id'),
+                            roles=matched_roles
+                        )
+                        role_responses.append(f"Role '{role_name}' added")
+                    else:
+                        role_responses.append(f"Role '{role_name}' not found")
+                
+                log['roles'] = role_responses
 
             logs.append(log)
 
+        # Save logs to a CSV file
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         if not os.path.exists('logs'):
             os.makedirs('logs')
         pd.DataFrame(logs).to_csv(f'logs/{timestamp}.csv', index=False)
+
         return logs
     
-    def create_user(
-        self,
-        user_fields: dict
-    ):
+    def create_import_users_csv(self):
         """
-        API Docs - https://docs.wristband.dev/reference/createuserv1
+        Creates an empty CSV file with the columns of the User model.
         """
-        if not self.token or not self.application_vanity_domain or not self.tenant_id or not self.identity_provider_name:
-            raise BadRequestError("Service is not properly initialized with required credentials.")
+        # Create a DataFrame
 
-        # Construct the URL
-        url = f'https://{self.application_vanity_domain}/api/v1/users'
-
-        # Headers to indicate the type of data being sent
-        headers = {
-            'content-type': 'application/json',
-            'accept': 'application/json',
-            'authorization': f'Bearer {self.token}',
-        }
-
-        request_body = {
-            'tenantId': self.tenant_id,
-            'identityProviderName': self.identity_provider_name,
-        }
-
-        # Check if the user_fields contain any invalid fields
-        for field in user_fields.keys():
-            if field not in self.allowed_user_fields:
-                raise BadRequestError(f"Invalid field: {field}")
-            elif isinstance(user_fields[field], float) and math.isnan(user_fields[field]):
-                continue  # Skip adding fields with NaN values
-            else:
-                request_body[field] = user_fields[field]
-
-        # Perform the GET request
-        response = requests.post(url, headers=headers, json=request_body)
-
-        if response.status_code == 404:
-            raise BadRequestError("ApplicationId is not valid - please rerun script & enter a valid applicationId")
-        elif response.status_code == 403:
-            raise AuthorizationError("Client is not authorized to perform the user export - please make sure that the client has the appropriate permissions assigned to it and then rerun script")
-
-        # Return response
-        return response
-    
-    def invite_existing_user(
-        self,
-        user_id: str
-    ):
-        """
-        API Docs - https://docs.wristband.dev/reference/inviteexistinguserv1
-        """
-        if not self.token or not self.application_vanity_domain or not self.tenant_id or not self.identity_provider_name:
-            raise BadRequestError("Service is not properly initialized with required credentials.")
-
-        # Construct the URL
-        url = f'https://{self.application_vanity_domain}/api/v1/existing-user-invitation/invite-user'
-
-        # Headers to indicate the type of data being sent
-        headers = {
-            'content-type': 'application/json',
-            'accept': 'application/json',
-            'authorization': f'Bearer {self.token}',
-        }
-
-        # Construct the request body
-        request_body = {
-            'userId': user_id
-        }
-
-        # Perform the POST request with JSON payload
-        response = requests.post(url, headers=headers, json=request_body)
-
-        if response.status_code == 404:
-            raise BadRequestError("ApplicationId is not valid - please rerun script & enter a valid applicationId")
-        elif response.status_code == 403:
-            raise AuthorizationError("Client is not authorized to perform the user export - please make sure that the client has the appropriate permissions assigned to it and then rerun script")
-
-        # Return response
-        return response          
-        
-    def get_tenant_roles(self):
-        """
-        API Docs - https://docs.wristband.dev/reference/querytenantrolesv1
-        Implements pagination to retrieve all roles.
-        """
-        if not self.token or not self.application_vanity_domain or not self.tenant_id:
-            raise BadRequestError("Service is not properly initialized with required credentials.")
-
-        # Base URL
-        base_url = f'https://{self.application_vanity_domain}/api/v1/tenants/{self.tenant_id}/roles'
-
-        # Headers to indicate the type of data being sent
-        headers = {
-            'accept': 'application/json',
-            'authorization': f'Bearer {self.token}',
-            'host': f'{self.application_vanity_domain}',
-            'content-type': 'application/json',
-        }
-
-        # Pagination parameters
-        start_index = 1
-        items_per_page = 20
-        all_roles = []
-
-        while True:
-            # Construct the URL with pagination
-            url = f"{base_url}?include_application_roles=true&fields=id,name,displayName&sort_by=displayName:asc&startIndex={start_index}&count={items_per_page}"
-
-            # Perform the GET request
-            response = requests.get(url, headers=headers)
-
-            if response.status_code == 404:
-                raise BadRequestError("ApplicationId is not valid - please rerun script & enter a valid applicationId")
-            elif response.status_code == 403:
-                raise AuthorizationError("Client is not authorized to perform the user export - please make sure that the client has the appropriate permissions assigned to it and then rerun script")
-
-            # Parse the response
-            json_data = response.json()
-
-            # Convert to RolesResponse
-            roles_response = RolesResponse.from_json(json.dumps(json_data))
-
-            # Add current page roles to the list
-            all_roles.extend(roles_response.items)
-
-            # Check if there are more items to fetch
-            total_results = roles_response.totalResults
-            start_index += items_per_page
-
-            if start_index > total_results:
-                break
-
-        return RolesResponse(
-            totalResults=len(all_roles),
-            startIndex=1,
-            itemsPerPage=items_per_page,
-            items=all_roles
-        )
-
-    # CSV Funcs
-    def create_input_users_csv(self):
-        # Create a DataFrame with the allowed user fields as columns
-        df = pd.DataFrame(columns=self.allowed_user_fields)
+        df = pd.DataFrame(columns=User.fields())
 
         # Save the DataFrame to a CSV file
-        df.to_csv(f'{self.input_file_name}.csv', index=False)
+        df.to_csv(f'{self.import_file_path}', index=False)
 
-    def get_input_users_from_csv(self):
+
+    def get_import_users_from_csv(self) -> List[User]:
+        """
+        Reads a CSV file and parses it into a list of User objects.
+        Throws a FileNotFoundError if the file does not exist.
+        """
+        # Check if the file exists
+        if not os.path.exists(self.import_file_path):
+            raise FileNotFoundError(f"The file '{self.import_file_path}' does not exist.")
+
         # Read the CSV file into a DataFrame
-        df = pd.read_csv(f'{self.input_file_name}.csv')
+        df = pd.read_csv(self.import_file_path)
 
-        # Convert the DataFrame to a dictionary
-        user_fields = df.to_dict(orient='records')
+        users = []
+        for _, row in df.iterrows():
+            # Drop NaN values and convert the row to a dictionary
+            user_data = row.dropna().to_dict()
+            # Convert the dictionary to a User object
+            user = User.from_dict(user_data)
+            users.append(user)
 
-        return user_fields
+        return users

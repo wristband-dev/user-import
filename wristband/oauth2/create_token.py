@@ -5,8 +5,23 @@ from wristband.exceptions import (
     AuthorizationError,
     BadRequestError,
 )
+import argparse
 
-def get_token(application_vanity_domain, client_id, client_secret):
+
+def create_token(
+        application_vanity_domain:str, 
+        client_id:str, 
+        client_secret:str
+):
+    """
+    API Docs - https://docs.wristband.dev/reference/tokenv1
+    """
+
+    if not application_vanity_domain or not client_id or not client_secret:
+        raise BadRequestError(
+            "Service is not properly initialized with required credentials."
+        )
+
     # Construct the URL
     url = f'https://{application_vanity_domain}/api/v1/oauth2/token'
 
@@ -49,3 +64,29 @@ def get_token(application_vanity_domain, client_id, client_secret):
 
     # Return the access token from the response JSON
     return response.json().get('access_token')
+
+
+def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Generate an access token using client credentials.")
+    parser.add_argument('--application_vanity_domain', required=True, help="The vanity domain of the application.")
+    parser.add_argument('--client_id', required=True, help="The client ID for authentication.")
+    parser.add_argument('--client_secret', required=True, help="The client secret for authentication.")
+    
+    # Parse command-line arguments
+    args = parser.parse_args()
+
+    try:
+        # Call the create_token function
+        token = create_token(
+            application_vanity_domain=args.application_vanity_domain,
+            client_id=args.client_id,
+            client_secret=args.client_secret
+        )
+        print(f"Access Token: {token}")
+    except (AuthenticationError, AuthorizationError, BadRequestError) as e:
+        print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    main()

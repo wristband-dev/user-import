@@ -20,7 +20,7 @@ Activate the virtual environment to ensure that any packages you install are con
 
    - On macOS/Linux:
    ```bash
-   source .venv/bin/activateg
+   source .venv/bin/activate
    ```
 
 3.	**Install the Dependencies**
@@ -42,51 +42,29 @@ Open the .env file in a text editor and replace the placeholder values with your
 
 Example .env file:
 ```ini
-
+APPLICATION_VANITY_DOMAIN=you_application_vanity_domain
+CLIENT_ID=your_client_id
+CLIENT_SECRET=your_client_secret
+TENANT_ID=your_tenant_id
+IDENTITY_PROVIDER_ID="wristband"
 ```
 
-5. **Distribute to PyPi**
-# Increment the version number
+## Distribute to PyPi
+
+**Increment the version number**
 - PATCH for bug fixes (e.g., 0.1.1)
    - MINOR for new features (e.g., 0.2.0)
    - MAJOR for incompatible API changes (e.g., 1.0.0)
 
-# Clean previous builds (optional but recommended)
+**Clean previous builds (optional but recommended)**
 ```bash
 rm -rf build dist *.egg-info 
 pip install --upgrade setuptools wheel
 python3 setup.py sdist bdist_wheel
 pip install --upgrade twine
 twine upload dist/*
-
-
-pypi-AgEIcHlwaS5vcmcCJGRlYjEyYjFmLWUwMTctNDVjOS05OTY0LTFmMzU2ZTNiYzdmOQACKlszLCI1M2Q5NGU3NS0xODI1LTQzNzQtYmY1ZS04NGRhOTFlYTViMzMiXQAABiB3yYxtfrKBrH3JgVrvAxc-xOjyh8vC3DjDVPn1MqnOog
-
 ```
-# Upgrade setuptools and wheel (optional but good practice)
-```bash
+https://pypi.org/manage/project/wristband/releases/
 
-```
-# Build the distribution packages
-```bash
+API_KEY=pypi-AgEIcHlwaS5vcmcCJGRlYjEyYjFmLWUwMTctNDVjOS05OTY0LTFmMzU2ZTNiYzdmOQACKlszLCI1M2Q5NGU3NS0xODI1LTQzNzQtYmY1ZS04NGRhOTFlYTViMzMiXQAABiB3yYxtfrKBrH3JgVrvAxc-xOjyh8vC3DjDVPn1MqnOog
 
-```
-# Upload the New Version to PyPI
-```bash
-
-```
-# Upload the package to PyPI
-```bash
-
-```
-# Verify the Upload
-```bash
-pip install wristband
-```
-
-
-
-python3 get_token.py \
-   --application_vanity_domain "invoexp-donato.us.wristband.dev" \
-   --client_id "ploopscbu5cmzi4hndvcsyepi4" \
-   --client_secret "dc0a4ba0a4e10cb670c1c95a66d11698"
