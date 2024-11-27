@@ -64,7 +64,7 @@ python3 setup.py sdist bdist_wheel
 pip install --upgrade twine
 twine upload dist/*
 ```
-https://pypi.org/manage/project/wristband/releases/
+
+[https://pypi.org/manage/project/wristband/releases/](https://pypi.org/manage/project/wristband/releases/)
 
 API_KEY=pypi-AgEIcHlwaS5vcmcCJGRlYjEyYjFmLWUwMTctNDVjOS05OTY0LTFmMzU2ZTNiYzdmOQACKlszLCI1M2Q5NGU3NS0xODI1LTQzNzQtYmY1ZS04NGRhOTFlYTViMzMiXQAABiB3yYxtfrKBrH3JgVrvAxc-xOjyh8vC3DjDVPn1MqnOog
-
