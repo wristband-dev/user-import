@@ -121,7 +121,6 @@ class UsersService:
         # Save the DataFrame to a CSV file
         df.to_csv(f'{self.import_file_path}', index=False)
 
-
     def get_import_users_from_csv(self) -> List[User]:
         """
         Reads a CSV file and parses it into a list of User objects.
