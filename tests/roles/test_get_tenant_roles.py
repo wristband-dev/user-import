@@ -1,6 +1,10 @@
+import os
+import sys
+
+# Add two parent directories to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from wristband.oauth2.create_token import create_token
 from wristband.roles.get_tenant_roles import get_tenant_roles
-import os
 
 application_vanity_domain = os.environ['APPLICATION_VANITY_DOMAIN']
 client_id = os.environ['CLIENT_ID'] 

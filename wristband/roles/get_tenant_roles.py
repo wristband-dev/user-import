@@ -56,7 +56,7 @@ def get_tenant_roles(
 
         # Check if there are more items to fetch
         total_results = roles_response.totalResults
-        start_index += items_per_page
+        start_index += len(roles_response.items)
 
         if start_index > total_results:
             break

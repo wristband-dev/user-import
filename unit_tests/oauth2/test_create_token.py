@@ -1,83 +1,38 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from wristband.users.models.user import User
-from wristband.exceptions import BadRequestError, AuthorizationError
+import sys
+import os
+
+# Add two parent directories to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from wristband.oauth2.create_token import create_token
 
-
-class TestCreateUser(unittest.TestCase):
-    def setUp(self):
-        self.token = "test_token"
-        self.application_vanity_domain = "test.vanity.domain"
-        self.tenant_id = "test_tenant"
-        self.identity_provider_name = "test_provider"
-        self.user = User(id="123", email="test@example.com", name="Test User")
-
+class TestCreateToken(unittest.TestCase):
     @patch('requests.post')
-    def test_create_user_success(self, mock_post):
-        # Mocking the response from requests.post
+    def test_create_token_success(self, mock_post):
+        # Arrange
+        # Set up a mock response object with the desired JSON payload
         mock_response = MagicMock()
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {'access_token': 'test_access_token'}
         mock_response.status_code = 200
-        mock_response.json.return_value = {"success": True}
         mock_post.return_value = mock_response
 
-        # Call the function
-        response = create_token(
-            token=self.token,
-            application_vanity_domain=self.application_vanity_domain,
-            tenant_id=self.tenant_id,
-            identity_provider_name=self.identity_provider_name,
-            user=self.user
+        # Act
+        token = create_token(
+            application_vanity_domain='valid-domain',
+            client_id='valid_client_id',
+            client_secret='valid_client_secret'
         )
 
-        # Assertions
-        mock_post.assert_called_once()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"success": True})
+        # Assert
+        self.assertEqual(token, 'test_access_token')
+        mock_post.assert_called_once_with(
+            'https://valid-domain/api/v1/oauth2/token',
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            data={'grant_type': 'client_credentials'},
+            auth=unittest.mock.ANY  # We don't need to assert exact auth object
+        )
 
-    @patch('requests.post')
-    def test_create_user_bad_request_error(self, mock_post):
-        # Mocking the response for a 404 error
-        mock_response = MagicMock()
-        mock_response.status_code = 404
-        mock_post.return_value = mock_response
-
-        with self.assertRaises(BadRequestError):
-            create_token(
-                token=self.token,
-                application_vanity_domain=self.application_vanity_domain,
-                tenant_id=self.tenant_id,
-                identity_provider_name=self.identity_provider_name,
-                user=self.user
-            )
-
-    @patch('requests.post')
-    def test_create_user_authorization_error(self, mock_post):
-        # Mocking the response for a 403 error
-        mock_response = MagicMock()
-        mock_response.status_code = 403
-        mock_post.return_value = mock_response
-
-        with self.assertRaises(AuthorizationError):
-            create_token(
-                token=self.token,
-                application_vanity_domain=self.application_vanity_domain,
-                tenant_id=self.tenant_id,
-                identity_provider_name=self.identity_provider_name,
-                user=self.user
-            )
-
-    def test_create_user_missing_parameters(self):
-        # Test for missing parameters
-        with self.assertRaises(BadRequestError):
-            create_token(
-                token=None,
-                application_vanity_domain=self.application_vanity_domain,
-                tenant_id=self.tenant_id,
-                identity_provider_name=self.identity_provider_name,
-                user=self.user
-            )
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
