@@ -1,4 +1,4 @@
-# wristband-python
+# user-import
 
 
 ## Setup Instructions
@@ -58,7 +58,7 @@
     CLIENT_ID=your_client_id
     CLIENT_SECRET=your_client_secret
     TENANT_ID=your_tenant_id
-    IDENTITY_PROVIDER_ID="wristband"
+    IDENTITY_PROVIDER_NAME="wristband"
     ```
 
 
