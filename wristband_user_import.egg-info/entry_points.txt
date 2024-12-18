@@ -1,2 +1,0 @@
-[console_scripts]
-create_token = wristband.oauth2:main
