@@ -3,14 +3,21 @@
 
 ## Setup Instructions
 
-1. **Create a Virtual Environment**
+1. **Clone Repo**
+    ```bash
+   git clone https://github.com/wristband-dev/user-import.git
+   ```
+
+2. **Open terminal or IDE at project route**
+
+3. **Create a Virtual Environment**
 
    To keep your project's dependencies isolated, it's recommended to use a virtual environment. You can create one using the following command:
    ```bash
    python3 -m venv .venv
    ```
 
-2.  **Activate the Virtual Environment**
+4.  **Activate the Virtual Environment**
 
     Activate the virtual environment to ensure that any packages you install are confined to this environment.
     - On Windows:
@@ -23,21 +30,21 @@
     source .venv/bin/activate
     ```
 
-3.	**Install the Dependencies**
+5.	**Install the Dependencies**
 
     With the virtual environment activated, install all required Python packages using:
     ```bash
     pip install -r requirements.txt
     ```
 
-3.	**Build the distribution locally**
+6.	**Build the distribution locally**
 
     ```bash
     pip install -e .
     ```
 
 
-4.  **Configure Environment Variables**
+7.  **Configure Environment Variables**
 
     Copy the example environment file and fill in your specific details:
     ```bash
@@ -60,6 +67,7 @@
 1. **Generate Import Users CSV**
     #### Python
     ```python 
+    from wristband.users.users_utils import UsersService
     svc = UsersService()
     svc.create_import_users_csv()
     ```
@@ -106,10 +114,11 @@
     ```
     #### Command Args
     **Note:** Argumenets are optional if using .env
+    - due to env variable states, if token is addded mid session then you must pass it through via the arguements
     ```bash
-    python3 wristband/users/users_service_upload_users_csv.py \\
-        --token {token} \\
-        --application_vanity_domain {application_vanity_domain} \\
-        --tenant_id {tenant_id} \\
+    python3 wristband/users/upload_users_csv.py \
+        --token {token} \
+        --application_vanity_domain {application_vanity_domain} \
+        --tenant_id {tenant_id} \
         --identity_provider_name {identity_provider_name}
     ```
