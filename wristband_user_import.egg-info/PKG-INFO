@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: wristband-user-import
+Version: 3.0.2
+Summary: A package for fetching data from the Wristband API
+Home-page: https://github.com/wristband-dev/user-import.git
+Author: Donato Di Ferdinando
+Author-email: fddiferd@gmail.com
+Requires-Dist: requests
+Requires-Dist: pandas

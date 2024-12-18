@@ -85,7 +85,7 @@ class UsersService:
 
                 for role_name in user_roles:
                     # Find the matching role by displayName
-                    matched_roles = [role for role in roles if role.get('displayName') == role_name]
+                    matched_roles = [role for role in roles if role.get('name') == role_name]
 
                     if matched_roles:
                         response = assign_roles_to_user(

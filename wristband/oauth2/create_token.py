@@ -9,9 +9,9 @@ import argparse
 
 
 def create_token(
-        application_vanity_domain:str, 
-        client_id:str, 
-        client_secret:str
+    application_vanity_domain:str, 
+    client_id:str, 
+    client_secret:str
 ):
     """
     API Docs - https://docs.wristband.dev/reference/tokenv1
