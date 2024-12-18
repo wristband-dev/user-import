@@ -6,17 +6,33 @@ from wristband.exceptions import (
     BadRequestError,
 )
 import argparse
-
+from dotenv import load_dotenv
+import os
+from typing import Optional
 
 def create_token(
-    application_vanity_domain:str, 
-    client_id:str, 
-    client_secret:str
+    application_vanity_domain: Optional[str] = None, 
+    client_id: Optional[str] = None, 
+    client_secret: Optional[str] = None
 ):
     """
     API Docs - https://docs.wristband.dev/reference/tokenv1
     """
 
+    load_dotenv()
+    
+    if application_vanity_domain is None:
+        os_application_vanity_domain = os.getenv("APPLICATION_VANITY_DOMAIN")
+        if os_application_vanity_domain:
+            application_vanity_domain = os_application_vanity_domain
+    if client_id is None:
+        os_client_id = os.getenv("CLIENT_ID")
+        if os_client_id:
+            client_id = os_client_id
+    if client_secret is None:
+        os_client_secret = os.getenv("CLIENT_SECRET")
+        if os_client_secret:
+            client_secret = os_client_secret
     if not application_vanity_domain or not client_id or not client_secret:
         raise BadRequestError(
             "Service is not properly initialized with required credentials."
@@ -63,15 +79,17 @@ def create_token(
         ) from err
 
     # Return the access token from the response JSON
-    return response.json().get('access_token')
+    token = response.json().get('access_token')
+    os.environ["TOKEN"] = token
+    return token
 
 
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Generate an access token using client credentials.")
-    parser.add_argument('--application_vanity_domain', required=True, help="The vanity domain of the application.")
-    parser.add_argument('--client_id', required=True, help="The client ID for authentication.")
-    parser.add_argument('--client_secret', required=True, help="The client secret for authentication.")
+    parser.add_argument('--application_vanity_domain', required=False, default=None, help="The vanity domain of the application.")
+    parser.add_argument('--client_id', required=False, default=None, help="The client ID for authentication.")
+    parser.add_argument('--client_secret', required=False, default=None, help="The client secret for authentication.")
     
     # Parse command-line arguments
     args = parser.parse_args()

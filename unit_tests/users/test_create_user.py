@@ -105,18 +105,6 @@ class TestCreateUser(unittest.TestCase):
                 user=user
             )
 
-    def test_create_user_missing_args(self):
-        # Missing token should raise BadRequestError
-        user = User(email="jane@example.com", fullName="Jane Doe")
-        with self.assertRaises(BadRequestError):
-            create_user(
-                token=None,
-                application_vanity_domain="valid-domain",
-                tenant_id="tenant123",
-                identity_provider_name="idpName",
-                user=user
-            )
-
 
 if __name__ == '__main__':
     unittest.main()

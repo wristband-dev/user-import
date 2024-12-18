@@ -9,12 +9,12 @@ setup(
     author_email='fddiferd@gmail.com',
     url='https://github.com/wristband-dev/user-import.git',
     packages=find_packages(),
-    entry_points={
-        'console_scripts': [
-            'create_token=wristband.oauth2:main',
-        ],
-    },
+    # entry_points={
+    #     'console_scripts': [
+    #         'create_token=wristband.oauth2:main',
+    #     ],
+    # },
     install_requires=[
-        'requests', 'pandas'
+        'requests', 'pandas', 'dotenv'
     ],  # Add any dependencies here
 )

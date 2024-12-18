@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from wristband.users.users_utils import UsersService
-from wristband.users.users_service_get_import_users_csv import main
+from wristband.users.get_import_users_csv import main
 
 class TestGetImportUsersCSV(unittest.TestCase):
     @patch.object(UsersService, 'get_import_users_from_csv')

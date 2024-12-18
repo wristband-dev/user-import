@@ -7,15 +7,17 @@ from wristband.users.create_user import create_user
 from wristband.users.invite_existing_user import invite_existing_user
 from wristband.roles.get_tenant_roles import get_tenant_roles
 from wristband.roles.assign_roles_to_user import assign_roles_to_user
-
+from typing import Optional
+from wristband.exceptions import BadRequestError
+from dotenv import load_dotenv
 
 class UsersService:
     def __init__(
         self, 
-        token:str = None,
-        application_vanity_domain:str = None, 
-        tenant_id:str = None, 
-        identity_provider_name:str = None
+        token: Optional[str] = None,
+        application_vanity_domain: Optional[str] = None, 
+        tenant_id: Optional[str] = None, 
+        identity_provider_name: Optional[str] = None
     ):
 
         self.token = token
@@ -32,6 +34,27 @@ class UsersService:
         """
         Reads a CSV file and uploads the users to Wristband.
         """
+
+        if not self.token:
+            os_token = os.getenv("TOKEN")
+            if os_token:
+                self.token = os_token
+        if not self.application_vanity_domain:
+            os_application_vanity_domain = os.getenv("APPLICATION_VANITY_DOMAIN")
+            if os_application_vanity_domain:
+                self.application_vanity_domain = os_application_vanity_domain
+        if not self.tenant_id:
+            os_tenant_id = os.getenv("TENANT_ID")
+            if os_tenant_id:
+                self.tenant_id = os_tenant_id
+        if not self.identity_provider_name:
+            os_identity_provider_name = os.getenv("IDENTITY_PROVIDER_NAME")
+            if os_identity_provider_name:
+                self.identity_provider_name = os_identity_provider_name
+
+        if not self.token or not self.application_vanity_domain or not self.tenant_id or not self.identity_provider_name:
+            raise BadRequestError("Service is not properly initialized with required credentials.")
+
         # Init
         logs = []
         did_fetch_roles = False

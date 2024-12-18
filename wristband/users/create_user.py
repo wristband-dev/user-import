@@ -3,18 +3,39 @@ from wristband.exceptions import BadRequestError, AuthorizationError
 from wristband.users.models.user import User
 import argparse
 import json
-
+from dotenv import load_dotenv
+import os
+from typing import Optional
 
 def create_user(
-    token: str,
-    application_vanity_domain: str,
-    tenant_id: str,
-    identity_provider_name: str,
-    user: User
+    user: User,
+    token: Optional[str] = None,
+    application_vanity_domain: Optional[str] = None,
+    tenant_id: Optional[str] = None,
+    identity_provider_name: Optional[str] = None
 ):
     """
     API Docs - https://docs.wristband.dev/reference/createuserv1
     """
+    load_dotenv()
+
+    if not token:
+        os_token = os.getenv("TOKEN")
+        if os_token:
+            token = os_token
+    if not application_vanity_domain:
+        os_application_vanity_domain = os.getenv("APPLICATION_VANITY_DOMAIN")
+        if os_application_vanity_domain:
+            application_vanity_domain = os_application_vanity_domain
+    if not tenant_id:
+        os_tenant_id = os.getenv("TENANT_ID")
+        if os_tenant_id:
+            tenant_id = os_tenant_id
+    if not identity_provider_name:
+        os_identity_provider_name = os.getenv("IDENTITY_PROVIDER_NAME")
+        if os_identity_provider_name:
+            identity_provider_name = os_identity_provider_name
+
     if not token or not application_vanity_domain or not tenant_id or not identity_provider_name:
         raise BadRequestError("Service is not properly initialized with required credentials.")
 
