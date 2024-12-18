@@ -15,6 +15,6 @@ setup(
     #     ],
     # },
     install_requires=[
-        'requests', 'pandas', 'dotenv'
+        'requests', 'pandas', 'python-dotenv'
     ],  # Add any dependencies here
 )

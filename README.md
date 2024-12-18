@@ -30,6 +30,12 @@
     pip install -r requirements.txt
     ```
 
+3.	**Build the distribution locally**
+
+    ```bash
+    pip install -e .
+    ```
+
 
 4.  **Configure Environment Variables**
 
@@ -59,7 +65,7 @@
     ```
     #### Command Args
     ```bash
-    python3 wristband/users/users_service_create_import_users_csv.py 
+    python3 wristband/users/create_import_users_csv.py 
     ```
 
 2. **Enter user information to csv**
