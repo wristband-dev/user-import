@@ -1,12 +1,14 @@
 name: Test
 on:
   push:
+    branches:
+      - main
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
+  pull_request:
     branches:
       - main
-  pull_request:
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
@@ -14,19 +16,37 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Run Python Unit Tests
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    name: Run Python Unit Tests on Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest pytest-xdist pytest-xml
 
-      - name: Run unit tests
-        run: python -m unittest discover
+      - name: Run unit tests in parallel
+        run: pytest -n auto --junitxml=report.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: report.xml
