@@ -82,43 +82,27 @@
     - ex: "app:invoexp:owner"
     - if you want to add multiple roles to a user, seperate by commas
 
-3. **Create a Token**
-    #### Python
-    ```python 
-    from wristband.oauth2.create_token import create_token
-    token = create_token(
-        application_vanity_domain, # Optional if using .env
-        client_id, # Optional if using .env
-        client_secret, # Optional if using .env
-    )
-    ```
-    #### Command Args
-    **Note:** Argumenets are optional if using .env
-    ```bash
-    python3 wristband/oauth2/create_token.py \
-        --application_vanity_domain {application_vanity_domain} \
-        --client_id {client_id} \
-        --client_secret {client_secret}
-    ```
-
-4. **Upload Users CSV to Wristband**
+3. **Upload Users CSV to Wristband**
     #### Python
     ```python 
     from wristband.users.upload_users_csv import upload_users_csv
     upload_users_csv(
-        token, # Optional if using .env
-        application_vanity_domain, # Optional if using .env
-        tenant_id, # Optional if using .env
-        identity_provider_name, # Optional if using .env
+        invite_users: bool = False
+        application_vanity_domain: Optional[str] = None, # Optional if using .env
+        client_id: Optional[str] = None, # Optional if using .env
+        client_secret: Optional[str] = None, # Optional if using .env
+        tenant_id: Optional[str] = None, # Optional if using .env
+        identity_provider_name: Optional[str] = None, # Optional if using .env
     )
     ```
     #### Command Args
     **Note:** Argumenets are optional if using .env
-    - due to env variable states, if token is addded mid session then you must pass it through via the arguements
     ```bash
     python3 wristband/users/upload_users_csv.py \
-        --token {token} \
+        --invite_users {invite_users} \
         --application_vanity_domain {application_vanity_domain} \
+        --client_id {client_id} \
+        --client_secret {client_secret} \
         --tenant_id {tenant_id} \
         --identity_provider_name {identity_provider_name}
     ```

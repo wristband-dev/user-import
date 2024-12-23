@@ -18,6 +18,7 @@ def create_token(
     """
     API Docs - https://docs.wristband.dev/reference/tokenv1
     """
+    response: requests.Response | None = None
 
     load_dotenv()
     
@@ -61,11 +62,11 @@ def create_token(
         )
         response.raise_for_status()
     except requests.exceptions.HTTPError as http_err:
-        if response.status_code == 401:
+        if response is not None and response.status_code == 401:
             raise AuthenticationError(
                 "Client credentials are not valid - please rerun script & enter valid credentials"
             ) from http_err
-        elif response.status_code == 400:
+        elif response is not None and response.status_code == 400:
             raise BadRequestError(
                 "Application vanity domain is not valid - please rerun script & enter valid credentials"
             ) from http_err

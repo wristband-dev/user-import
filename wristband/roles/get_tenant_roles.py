@@ -43,7 +43,7 @@ def get_tenant_roles(
         if response.status_code == 404:
             raise BadRequestError("ApplicationId is not valid - please rerun script & enter a valid applicationId")
         elif response.status_code == 403:
-            raise AuthorizationError("Client is not authorized to perform the user export - please make sure that the client has the appropriate permissions assigned to it and then rerun script")
+            raise AuthorizationError("Client is not authorized to perform the user import - please make sure that the client has the appropriate permissions assigned to it and then rerun script")
 
         # Parse the response
         json_data = response.json()

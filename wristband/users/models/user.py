@@ -6,7 +6,6 @@ from typing import Optional, List
 class User:
     email: str  # Required field
     username: Optional[str] = None
-    password: Optional[str] = None
     emailVerified: Optional[bool] = False
     externalId: Optional[str] = None
     fullName: Optional[str] = None

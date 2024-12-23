@@ -61,6 +61,10 @@ class UsersService:
 
         # Get users
         users = self.get_import_users_from_csv()
+
+        if len(users) == 0:
+            raise BadRequestError("No users found in the CSV file.")
+
         for user in users:
             
             response = create_user(
